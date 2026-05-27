@@ -13,6 +13,8 @@ ALLOWED_EXTENSIONS = {  'png',
     'mkv'}
 
 app = Flask(__name__)
+os.makedirs("upload_folder", exist_ok=True)
+os.makedirs("static/reels", exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
  
 
