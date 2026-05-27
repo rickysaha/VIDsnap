@@ -2,6 +2,8 @@ import os
 import time
 from texttoaudio import text_to_speech_file
 import subprocess
+os.makedirs("upload_folder", exist_ok=True)
+os.makedirs("static/reels", exist_ok=True)
 
 
 def text_to_audio(folder):
