@@ -1,0 +1,11 @@
+env/
+venv/
+__pycache__/
+*.pyc
+.done.txt
+.DS_Store
+
+static/reels/
+upload_folder/
+
+.env
