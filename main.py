@@ -41,8 +41,6 @@ def create():
         rec_id = request.form.get("uuid")
         desc = request.form.get("text")
 
-        input_files = []
-
         folder_path = os.path.join(app.config['UPLOAD_FOLDER'], rec_id)
 
         os.makedirs(folder_path, exist_ok=True)
@@ -71,8 +69,6 @@ def create():
                         file_options={"upsert": "true"}
                     )
 
-                input_files.append(filename)
-
                 print(filename)
 
         # save description locally
@@ -91,34 +87,8 @@ def create():
                 file_options={"upsert": "true"}
             )
 
-        # create input.txt
-        input_txt_path = os.path.join(folder_path, "input.txt")
-
-        with open(input_txt_path, "w") as f:
-
-            for fl in input_files:
-
-                ext = fl.split(".")[-1].lower()
-
-                # VIDEO CASE
-                if ext in ["mp4", "mov", "avi", "mkv"]:
-
-                    f.write(f"file '{fl}'\n")
-
-                # IMAGE CASE
-                else:
-
-                    f.write(f"file '{fl}'\n")
-                    f.write("duration 1\n")
-
-            # repeat last image for ffmpeg slideshow
-            if input_files:
-
-                last_file = input_files[-1]
-
-                if not last_file.lower().endswith(("mp4", "mov", "avi", "mkv")):
-
-                    f.write(f"file '{last_file}'\n")
+        # NOTE: input.txt is intentionally NOT created here.
+        # The worker generates it with absolute paths, which FFmpeg requires.
 
     return render_template("create.html", myid=myid)
 

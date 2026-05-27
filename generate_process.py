@@ -197,10 +197,9 @@ def create_image_concat_file(folder_path, image_files):
         raise FileNotFoundError(f"No images found and no video found in {folder_path}")
 
     if input_path.exists() and input_path.stat().st_size > 0:
-        log(f"Using existing concat input: {input_path}")
-        return input_path
+        log(f"Regenerating image concat input with absolute paths: {input_path}")
 
-    log(f"Creating missing image concat input: {input_path}")
+    log(f"Creating image concat input: {input_path}")
     lines = []
 
     for image_path in image_files:
@@ -249,6 +248,7 @@ def create_reel(folder):
             "ffmpeg",
             "-y",
             "-hide_banner",
+            "-loglevel", "error",  # suppress swscaler and other warnings
             "-i",
             str(input_video),
             "-i",
@@ -290,6 +290,7 @@ def create_reel(folder):
             "ffmpeg",
             "-y",
             "-hide_banner",
+            "-loglevel", "error",  # suppress swscaler and other warnings
             "-f",
             "concat",
             "-safe",
