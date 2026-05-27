@@ -45,7 +45,8 @@ def create_reel(folder):
     if video_file:
 
         command = f'''
-        ffmpeg -i "{folder_path}/{video_file}" \
+        ffmpeg -y \
+        -i "{folder_path}/{video_file}" \
         -i "{folder_path}/audio.mp3" \
         -c:v libx264 \
         -c:a aac \
@@ -57,7 +58,8 @@ def create_reel(folder):
     else:
 
         command = f'''
-        ffmpeg -f concat -safe 0 \
+        ffmpeg -y \
+        -f concat -safe 0 \
         -i "{folder_path}/input.txt" \
         -i "{folder_path}/audio.mp3" \
         -vf "scale=1080:1920:force_original_aspect_ratio=decrease,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black" \
@@ -69,7 +71,20 @@ def create_reel(folder):
         "{output_file}"
         '''
 
-    subprocess.run(command, shell=True, check=True)
+    print(command)
+
+    result = subprocess.run(
+        command,
+        shell=True,
+        capture_output=True,
+        text=True
+    )
+
+    print("STDOUT:", result.stdout)
+    print("STDERR:", result.stderr)
+
+    if result.returncode != 0:
+        raise Exception("FFMPEG FAILED")
 
     # upload final reel to supabase
     with open(output_file, "rb") as f:

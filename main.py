@@ -62,8 +62,9 @@ def create():
                 # save locally
                 file.save(file_path)
 
-                # upload to supabase
+                # upload original file to supabase
                 with open(file_path, "rb") as f:
+
                     supabase.storage.from_("uploads").upload(
                         f"{rec_id}/{filename}",
                         f,
@@ -78,10 +79,12 @@ def create():
         desc_path = os.path.join(folder_path, "desc.txt")
 
         with open(desc_path, "w") as f:
+
             f.write(desc)
 
         # upload description to supabase
         with open(desc_path, "rb") as f:
+
             supabase.storage.from_("uploads").upload(
                 f"{rec_id}/desc.txt",
                 f,
@@ -91,21 +94,34 @@ def create():
         # create input.txt
         input_txt_path = os.path.join(folder_path, "input.txt")
 
-        for fl in input_files:
+        with open(input_txt_path, "w") as f:
 
-            ext = fl.split(".")[-1].lower()
+            for fl in input_files:
 
-            with open(input_txt_path, "a") as f:
+                ext = fl.split(".")[-1].lower()
 
-                # videos
+                # VIDEO CASE
                 if ext in ["mp4", "mov", "avi", "mkv"]:
+
                     f.write(f"file '{fl}'\n")
 
-                # images
+                # IMAGE CASE
                 else:
-                    f.write(f"file '{fl}'\nduration 1\n")
+
+                    f.write(f"file '{fl}'\n")
+                    f.write("duration 1\n")
+
+            # repeat last image for ffmpeg slideshow
+            if input_files:
+
+                last_file = input_files[-1]
+
+                if not last_file.lower().endswith(("mp4", "mov", "avi", "mkv")):
+
+                    f.write(f"file '{last_file}'\n")
 
     return render_template("create.html", myid=myid)
+
 
 @app.route("/gallery")
 def gallery():
