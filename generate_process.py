@@ -69,7 +69,8 @@ def run_ffmpeg(command):
 def require_ffmpeg():
     if not shutil.which("ffmpeg"):
         raise RuntimeError(
-            "ffmpeg was not found on PATH. On Railway, keep ffmpeg in nixpacks.toml."
+            "ffmpeg was not found on PATH. On Railway, nixpacks.toml should contain "
+            '[phases.setup] nixPkgs = ["...", "ffmpeg"]. Redeploy after changing it.'
         )
 
 
@@ -358,10 +359,16 @@ def process_folder(folder):
 
 def main():
     ensure_done_file()
-    require_ffmpeg()
 
     while True:
         log("Worker tick: checking for pending folders")
+
+        try:
+            require_ffmpeg()
+        except Exception as exc:
+            log(f"Dependency error: {exc}")
+            time.sleep(4)
+            continue
 
         done_folders = read_done_folders()
         sync_pending_supabase_folders(done_folders)
