@@ -107,13 +107,26 @@ def create():
 
     return render_template("create.html", myid=myid)
 
-
 @app.route("/gallery")
 def gallery():
 
-    reels = os.listdir("static/reels")
+    response = supabase.storage.from_("uploads").list()
 
-    print(reels)
+    reels = []
+
+    for folder in response:
+        folder_name = folder["name"]
+
+        files = supabase.storage.from_("uploads").list(folder_name)
+
+        for file in files:
+            file_name = file["name"]
+
+            public_url = supabase.storage.from_("uploads").get_public_url(
+                f"{folder_name}/{file_name}"
+            )
+
+            reels.append(public_url)
 
     return render_template("gallery.html", reels=reels)
 
