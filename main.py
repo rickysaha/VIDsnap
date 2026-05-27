@@ -2,7 +2,7 @@ from flask import Flask, render_template,request
 import uuid
 import os
 from werkzeug.utils import secure_filename
-from generate_process import text_to_audio, create_reel
+from supabase_client import supabase
 
 UPLOAD_FOLDER = 'upload_folder'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', }
@@ -33,15 +33,19 @@ def create():
                 if not os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'],rec_id)):
                  os.mkdir(os.path.join(app.config['UPLOAD_FOLDER'],rec_id))
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'],rec_id, filename))
+                with open(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, filename), "rb") as f:
+                     supabase.storage.from_("uploads").upload(
+                      f"{rec_id}/{filename}",f)
                 input_files.append(file.filename)
                 with open(os.path.join(app.config['UPLOAD_FOLDER'],rec_id, "desc.txt"), "w") as f:
                     f.write(desc)
+                with open(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, "desc.txt"), "rb") as f:
+                   supabase.storage.from_("uploads").upload(
+                    f"{rec_id}/desc.txt",f)
                 for f2 in input_files:
                    with open (os.path.join(app.config['UPLOAD_FOLDER'],rec_id, "input.txt"), "a")as f:
                         f.write(f"file '{f2}'\nduration 1\n")
-       text_to_audio(rec_id)
-       create_reel(rec_id) 
-
+     
     return render_template("create.html", myid=myid)
 
 @app.route("/gallery")
