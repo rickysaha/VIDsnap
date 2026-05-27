@@ -2,6 +2,7 @@ from flask import Flask, render_template,request
 import uuid
 import os
 from werkzeug.utils import secure_filename
+from generate_process import text_to_audio, create_reel
 
 UPLOAD_FOLDER = 'upload_folder'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', }
@@ -38,6 +39,8 @@ def create():
                 for f2 in input_files:
                    with open (os.path.join(app.config['UPLOAD_FOLDER'],rec_id, "input.txt"), "a")as f:
                         f.write(f"file '{f2}'\nduration 1\n")
+       text_to_audio(rec_id)
+       create_reel(rec_id) 
 
     return render_template("create.html", myid=myid)
 
