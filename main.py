@@ -115,18 +115,25 @@ def gallery():
     reels = []
 
     for folder in response:
+
         folder_name = folder["name"]
 
         files = supabase.storage.from_("uploads").list(folder_name)
 
         for file in files:
-            file_name = file["name"]
 
-            public_url = supabase.storage.from_("uploads").get_public_url(
-                f"{folder_name}/{file_name}"
-            )
+            file_name = file["name"].lower()
 
-            reels.append(public_url)
+            # ONLY SHOW VIDEOS
+            if file_name.endswith((".mp4", ".mov", ".avi", ".mkv")):
+
+                public_url = supabase.storage.from_("uploads").get_public_url(
+                    f"{folder_name}/{file_name}"
+                )
+
+                reels.append(public_url)
+
+    print(reels)
 
     return render_template("gallery.html", reels=reels)
 
