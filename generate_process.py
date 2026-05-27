@@ -1,7 +1,10 @@
 import os
 import time
-from texttoaudio import text_to_speech_file
 import subprocess
+
+from texttoaudio import text_to_speech_file
+from supabase_client import supabase
+
 os.makedirs("upload_folder", exist_ok=True)
 os.makedirs("static/reels", exist_ok=True)
 
@@ -29,8 +32,11 @@ def create_reel(folder):
     video_file = None
 
     for file in files:
+
         if file.lower().endswith(video_extensions):
+
             video_file = file
+
             break
 
     output_file = f"static/reels/{folder}.mp4"
@@ -65,10 +71,25 @@ def create_reel(folder):
 
     subprocess.run(command, shell=True, check=True)
 
+    # upload final reel to supabase
+    with open(output_file, "rb") as f:
+
+        supabase.storage.from_("uploads").upload(
+            f"{folder}/{folder}.mp4",
+            f,
+            file_options={"upsert": "true"}
+        )
+
     print("Create reel:", folder)
 
 
 if __name__ == "__main__":
+
+    # create done.txt if missing
+    if not os.path.exists("done.txt"):
+
+        with open("done.txt", "w") as f:
+            pass
 
     while True:
 
@@ -100,6 +121,7 @@ if __name__ == "__main__":
                     create_reel(folder)
 
                     with open("done.txt", "a") as f:
+
                         f.write(folder + "\n")
 
                 except Exception as e:
