@@ -41,7 +41,10 @@ def create():
                     f.write(desc)
                 with open(os.path.join(app.config['UPLOAD_FOLDER'], rec_id, "desc.txt"), "rb") as f:
                    supabase.storage.from_("uploads").upload(
-                    f"{rec_id}/desc.txt",f)
+                    f"{rec_id}/desc.txt",
+                        f,
+                     {"upsert": "true"}
+         )
                 for f2 in input_files:
                    with open (os.path.join(app.config['UPLOAD_FOLDER'],rec_id, "input.txt"), "a")as f:
                         f.write(f"file '{f2}'\nduration 1\n")
