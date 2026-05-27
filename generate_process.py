@@ -69,8 +69,9 @@ def run_ffmpeg(command):
 def require_ffmpeg():
     if not shutil.which("ffmpeg"):
         raise RuntimeError(
-            "ffmpeg was not found on PATH. On Railway, nixpacks.toml should contain "
-            '[phases.setup] nixPkgs = ["...", "ffmpeg"]. Redeploy after changing it.'
+            "ffmpeg was not found on PATH. On Railway, install ffmpeg in the runtime "
+            "image with railpack.json deploy.aptPackages or with the "
+            "RAILPACK_DEPLOY_APT_PACKAGES=ffmpeg service variable, then redeploy."
         )
 
 
